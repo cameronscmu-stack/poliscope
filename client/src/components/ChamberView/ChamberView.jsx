@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useFilter } from '../../context/FilterContext';
 
 // SVG canvas dimensions
@@ -62,8 +61,7 @@ function bracketPath(x1, y1, x2, y2) {
 
 export default function ChamberView({ members = [], filtered = [] }) {
   const [hovered, setHovered] = useState(null);
-  const navigate = useNavigate();
-  const { highlightedIds } = useFilter();
+  const { highlightedIds, setSelectedMemberId } = useFilter();
 
   const filteredSet   = useMemo(() => new Set(filtered.map(m => m.id)), [filtered]);
   const isFiltering   = filtered.length < members.length;
@@ -193,7 +191,7 @@ export default function ChamberView({ members = [], filtered = [] }) {
               }}
               onMouseEnter={() => setHovered(member)}
               onMouseLeave={() => setHovered(null)}
-              onClick={() => navigate(`/rep/${member.id}`)}
+              onClick={() => setSelectedMemberId(member.id)}
               role="button"
               aria-label={`${member.first_name} ${member.last_name} (${member.state})`}
             >

@@ -27,7 +27,6 @@ export function filterMembers(members, { party, stateFilter, gradeFilter, search
 export default function Home() {
   const { chamber, party, stateFilter, gradeFilter, searchQuery } = useFilter();
   const { members, loading, error } = useMembers(chamber);
-
   const filtered = filterMembers(members, { party, stateFilter, gradeFilter, searchQuery });
 
   if (loading && members.length === 0) {
@@ -49,7 +48,7 @@ export default function Home() {
           Could not load members: {error}
         </p>
       )}
-      <div style={{ padding: '8px 16px 4px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: '8px 16px 4px' }}>
         <span style={{ fontSize: 12, opacity: 0.45, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--navy)' }}>
           {filtered.length === members.length
             ? `${members.length} members`

@@ -8,8 +8,9 @@ export function FilterProvider({ children }) {
   const [stateFilter, setStateFilter] = useState('all');
   const [gradeFilter, setGradeFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  // IDs highlighted by Find My Rep — drawn with a special ring in the chamber
   const [highlightedIds, setHighlightedIds] = useState(new Set());
+  // Global modal — any component can open a senator profile
+  const [selectedMemberId, setSelectedMemberId] = useState(null);
 
   return (
     <FilterContext.Provider value={{
@@ -19,6 +20,7 @@ export function FilterProvider({ children }) {
       gradeFilter, setGradeFilter,
       searchQuery, setSearchQuery,
       highlightedIds, setHighlightedIds,
+      selectedMemberId, setSelectedMemberId,
     }}>
       {children}
     </FilterContext.Provider>

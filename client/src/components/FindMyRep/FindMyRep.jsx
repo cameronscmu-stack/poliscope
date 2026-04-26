@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useFilter } from '../../context/FilterContext';
 
 const PARTY_COLOR = { D: '#1a4aaa', R: '#cc0000', I: '#666' };
@@ -10,8 +9,7 @@ export function FindMyRep({ onClose }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
-  const { setStateFilter, setChamber, setHighlightedIds } = useFilter();
+  const { setStateFilter, setChamber, setHighlightedIds, setSelectedMemberId } = useFilter();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -46,7 +44,7 @@ export function FindMyRep({ onClose }) {
 
   function handleMemberClick(id) {
     onClose();
-    navigate(`/rep/${id}`);
+    setSelectedMemberId(id);
   }
 
   return (
