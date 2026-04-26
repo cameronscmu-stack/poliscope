@@ -1,9 +1,7 @@
-// client/src/pages/Home.jsx
-import { useNavigate } from 'react-router-dom';
-import { ChamberGrid } from '../components/ChamberGrid/ChamberGrid';
-import { FilterBar } from '../components/FilterBar/FilterBar';
 import { useFilter } from '../context/FilterContext';
 import { useMembers } from '../hooks/useMembers';
+import { FilterBar } from '../components/FilterBar/FilterBar';
+import ChamberView from '../components/ChamberView/ChamberView';
 
 const PARTY_DISPLAY = { R: 'republican', D: 'democrat', I: 'independent' };
 
@@ -27,11 +25,21 @@ export function filterMembers(members, { party, stateFilter, gradeFilter, search
 }
 
 export default function Home() {
-  const navigate = useNavigate();
   const { chamber, party, stateFilter, gradeFilter, searchQuery } = useFilter();
   const { members, loading, error } = useMembers(chamber);
 
-  const visible = filterMembers(members, { party, stateFilter, gradeFilter, searchQuery });
+  const filtered = filterMembers(members, { party, stateFilter, gradeFilter, searchQuery });
+
+  if (loading && members.length === 0) {
+    return (
+      <div className="min-h-screen">
+        <FilterBar />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 400 }}>
+          <p style={{ opacity: 0.5, fontSize: 14 }}>Loading congressional data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -41,13 +49,14 @@ export default function Home() {
           Could not load members: {error}
         </p>
       )}
-      <div className="px-4 py-6">
-        <ChamberGrid
-          members={visible}
-          loading={loading}
-          onSelectMember={id => navigate(`/rep/${id}`)}
-        />
+      <div style={{ padding: '8px 16px 4px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 12, opacity: 0.45, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--navy)' }}>
+          {filtered.length === members.length
+            ? `${members.length} members`
+            : `${filtered.length} of ${members.length} members`}
+        </span>
       </div>
+      <ChamberView members={members} filtered={filtered} />
     </div>
   );
 }
