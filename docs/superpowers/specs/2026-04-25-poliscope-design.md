@@ -133,6 +133,44 @@ Claude is used **exclusively** to translate scores into plain English. It receiv
 
 ---
 
+## Design System
+
+### Visual Direction: CNN Light — Broadcast Data on White
+Light mode. CNN election night coverage energy translated to a web app: clean white surface, CNN red-to-navy masthead, data panels with red left-border accents, color-coded feed cards. The broadcast language of urgency and clarity without the dark background.
+
+### Color Palette
+| Token | Value | Usage |
+|---|---|---|
+| `--bg-sky` | `linear-gradient(160deg, #ddeeff, #eef4ff, #f5f8ff)` | App background |
+| `--surface` | `rgba(255,255,255,0.75)` + `backdrop-filter: blur(20px)` | Cards, sheets, panels |
+| `--border` | `rgba(255,255,255,0.9)` | Card borders |
+| `--navy` | `#0a1f6e` | Primary text, headers, structure |
+| `--sky-accent` | `#1a4aaa` | Labels, links, category chips |
+| `--alert` | `#cc2222` | Conflict flags, F grades, danger |
+| `--positive` | `#1a7a4a` | A grades, clean stats, attendance |
+| `--shadow` | `rgba(20,60,180,0.12)` | Card drop shadows |
+
+### Typography
+| Role | Font | Weight | Usage |
+|---|---|---|---|
+| Everything display | Bricolage Grotesque | 700–800 | Names, grades, stats, labels, headers — warm and distinctive |
+| Body & data | DM Sans | 300 | Descriptions, explanatory text, fine print |
+
+Bricolage Grotesque is the single display font across all UI. Its warmth and letter personality set Poliscope apart from cold data tools without sacrificing authority.
+
+### Glass Cards
+All cards use frosted glass: `background: rgba(255,255,255,0.75); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.9); box-shadow: 0 20px 60px rgba(20,60,180,0.12)`. Cards feel like they float above the gradient background.
+
+### Motion Principles
+- Player card rises from bottom as a spring sheet (Motion)
+- Grade badge stamps in on reveal (Rive)
+- Stats stagger-reveal on card open (Motion)
+- Senate ↔ House camera sweep (React Three Fiber)
+- Conflict flag pulses gently on entry (Motion)
+- All animations respect `prefers-reduced-motion`
+
+---
+
 ## Technology Stack
 
 | Layer | Technology | Purpose |
