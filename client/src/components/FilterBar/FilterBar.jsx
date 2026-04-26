@@ -90,6 +90,7 @@ export function FilterBar() {
         {['senate', 'house'].map(c => (
           <button
             key={c}
+            type="button"
             onClick={() => setChamber(c)}
             style={{
               ...pillBase,
@@ -112,12 +113,13 @@ export function FilterBar() {
           return (
             <button
               key={opt.value}
+              type="button"
               onClick={() => setParty(opt.value)}
               style={{
                 ...pillBase,
                 backgroundColor: active ? activeColor : 'var(--surface)',
                 color: active ? 'white' : 'var(--navy)',
-                border: active && opt.color ? `1px solid ${opt.color}` : '1px solid var(--border)',
+                border: active ? `1px solid ${opt.color ?? 'var(--navy)'}` : '1px solid var(--border)',
               }}
             >
               {opt.label}
