@@ -1,1 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=DM+Sans:wght@300;400&display=swap');
+
 @import "tailwindcss";
+
+:root {
+  --bg-sky: linear-gradient(160deg, #ddeeff 0%, #eef4ff 50%, #f5f8ff 100%);
+  --surface: rgba(255, 255, 255, 0.75);
+  --border: rgba(255, 255, 255, 0.9);
+  --navy: #0a1f6e;
+  --sky-accent: #1a4aaa;
+  --alert: #cc2222;
+  --positive: #1a7a4a;
+  --shadow: rgba(20, 60, 180, 0.12);
+}
+
+body {
+  background: var(--bg-sky);
+  min-height: 100dvh;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  color: var(--navy);
+}
+
+h1, h2, h3, h4, .display {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+}
+
+.glass-card {
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 60px var(--shadow);
+  border-radius: 16px;
+}
