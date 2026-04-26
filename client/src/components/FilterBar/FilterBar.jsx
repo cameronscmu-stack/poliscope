@@ -34,9 +34,9 @@ const STATES = [
 
 const PARTY_OPTIONS = [
   { value: 'all', label: 'All', color: null },
-  { value: 'R', label: 'Republican', color: '#cc0000' },
-  { value: 'D', label: 'Democrat', color: '#1a4aaa' },
-  { value: 'I', label: 'Independent', color: '#555555' },
+  { value: 'R', label: 'Republican', color: 'var(--party-r)' },
+  { value: 'D', label: 'Democrat', color: 'var(--party-d)' },
+  { value: 'I', label: 'Independent', color: 'var(--party-i)' },
 ];
 
 const pillBase = {

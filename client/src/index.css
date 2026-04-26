@@ -11,6 +11,9 @@
   --alert: #cc2222;
   --positive: #1a7a4a;
   --shadow: rgba(20, 60, 180, 0.12);
+  --party-r: #cc0000;
+  --party-d: #1a4aaa;
+  --party-i: #555555;
 }
 
 body {

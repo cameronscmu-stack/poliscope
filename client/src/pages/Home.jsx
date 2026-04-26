@@ -7,7 +7,7 @@ import { useMembers } from '../hooks/useMembers';
 
 const PARTY_DISPLAY = { R: 'republican', D: 'democrat', I: 'independent' };
 
-function filterMembers(members, { party, stateFilter, gradeFilter, searchQuery }) {
+export function filterMembers(members, { party, stateFilter, gradeFilter, searchQuery }) {
   return members.filter(m => {
     if (party !== 'all' && m.party !== party) return false;
     if (stateFilter !== 'all' && m.state !== stateFilter) return false;
