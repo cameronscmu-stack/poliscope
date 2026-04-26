@@ -107,6 +107,47 @@ Plain-English breakdown of any bill on the floor or in committee.
 
 ---
 
+## Pattern & Influence Engine
+
+An automated system that detects and surfaces connections between money, lobbying, and votes that would otherwise require hours of manual research. Every finding is factual, cited, and language-disciplined — the system never says "corrupt," it states what the data shows.
+
+### Three Detection Systems
+
+**1. Money → Vote Pattern Detection**
+Cross-references FEC donor data against voting records with timeline analysis. Flags when:
+- A member received donations from an industry within 12 months of voting on legislation benefiting that industry
+- The donation amount is statistically significant vs. the member's average donation size
+- Multiple members show the same pattern on the same bill (systemic flag)
+
+Displayed as: a "Pattern Alert" feed item with evidence chain (donor → amount → vote → outcome) and all sources cited inline.
+
+**2. Lobbying Influence Mapping**
+Connects Senate/House lobbying disclosure data to votes. Flags when:
+- A lobbying organization spent above threshold on a bill
+- The percentage of YES voters who received donations from that org is statistically significant
+- Average donation size to YES voters vs. NO voters shows meaningful divergence
+
+Displayed as: a "Lobbying Pattern" alert in the feed + a section on the Bill Halftime screen showing lobbying spend vs. vote breakdown.
+
+**3. Pork & Earmark Detector**
+NLP analysis on full bill text, cross-referenced with FEC and USASpending.gov data. Flags three provision types:
+
+| Type | What it detects |
+|---|---|
+| **Earmark** | Provision benefiting a specific geography or company where the sponsoring member received donations from that company or represents that geography |
+| **Unrelated Rider** | Provision with no semantic connection to the bill's stated purpose, added in committee markup |
+| **Conflict of Interest Provision** | Provision that directly benefits a company in which voting members hold stock |
+
+Each flagged provision shows: section number, dollar amount, beneficiary, the member who added it, relevant donation data, and direct source links.
+
+### Influence Web (Politician Halftime)
+A visual chain map showing the full money→influence trail per member, organized by industry. Each chain: Corporation → PAC → Donation amount → Member vote → Bill outcome. Multiple industries shown in parallel. Every node is a cited fact.
+
+### Language Discipline
+The Pattern Engine never uses the words "corrupt," "bribe," "quid pro quo," or "illegal." Every output states only verifiable facts: amounts, dates, vote records, bill sections. The reader draws conclusions. The app provides receipts.
+
+---
+
 ## Constituent Grade — Scoring Methodology
 
 A single A–F letter grade (backed by a 0–100 score) representing how much a politician is working for their constituents vs. themselves or their party. Fully algorithmic, methodology published publicly.
