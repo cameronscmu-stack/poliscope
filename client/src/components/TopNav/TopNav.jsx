@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useFilter } from '../../context/FilterContext';
 
 export function TopNav() {
+  const [focusedSearch, setFocusedSearch] = useState(false);
   const { searchQuery, setSearchQuery } = useFilter();
   const location = useLocation();
   const navigate = useNavigate();
@@ -51,6 +53,8 @@ export function TopNav() {
               type="search"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
+              onFocus={() => setFocusedSearch(true)}
+              onBlur={() => setFocusedSearch(false)}
               placeholder="Search members…"
               aria-label="Search members"
               style={{
@@ -58,7 +62,7 @@ export function TopNav() {
                 maxWidth: '360px',
                 padding: '7px 12px',
                 borderRadius: '8px',
-                border: '1px solid var(--border)',
+                border: focusedSearch ? '2px solid var(--sky-accent)' : '1px solid var(--border)',
                 background: 'rgba(255,255,255,0.6)',
                 color: 'var(--navy)',
                 fontSize: '0.875rem',
