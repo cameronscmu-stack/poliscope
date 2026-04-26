@@ -48,7 +48,7 @@ The default view. A real-time stream of activity across all 535 members of Congr
 - Each event is a card with politician photo, name, event type badge, and one-line summary
 - Tap any event → opens the Politician Player Card or Bill Halftime depending on type
 - Filter bar: All / Votes / Trades / Money / Bills
-- "My Reps" toggle — shows only the user's Senators and Representative based on location
+- "My Reps" toggle — shows only the user's Senators and Representative. Location determined by user-entered zip code on first use (stored in account or localStorage for guests). No GPS required.
 
 ---
 
@@ -137,7 +137,7 @@ Claude is used **exclusively** to translate scores into plain English. It receiv
 | Senate eFD / STOCK Act | Financial disclosures, stock trades | As filed (can lag weeks) |
 | ProPublica Congress API | Vote scores, bill history, member profiles | Daily |
 | CBO | Bill cost estimates | As published |
-| Think tank balance layer | Expert consensus scoring for bill impact (Brookings, Heritage, Cato, Urban Institute) | Curated, updated per major bill |
+| Think tank balance layer | Expert consensus scoring for bill impact — Brookings (center-left), Heritage (right), Cato (libertarian), Urban Institute (center-left), AEI (right). Each org's published position on a bill is fetched or curated manually for major bills, then averaged across the political spectrum to produce a balance score. No single org's framing dominates. | Curated per major bill (100+ bills/year expected) |
 
 ---
 
