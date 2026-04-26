@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const W = 1400;
 const H = 720;
 const CX = W / 2;   // horizontal center
-const CY = H + 15;  // dais center just below the viewport bottom
+const CY = -15;     // dais center just above the viewport top
 
 // Hemicycle rows: innermost → outermost
 const ROW_CONFIG = [
@@ -34,7 +34,7 @@ function rowSeats(radius, count) {
     const angle = ANGLE_START + t * (ANGLE_END - ANGLE_START);
     return {
       x: CX - radius * Math.cos(angle),
-      y: CY - radius * Math.sin(angle),
+      y: CY + radius * Math.sin(angle),
     };
   });
 }
@@ -45,7 +45,7 @@ function arcPath(radius, steps = 64) {
     const t     = i / steps;
     const angle = ANGLE_START + t * (ANGLE_END - ANGLE_START);
     const x = CX - radius * Math.cos(angle);
-    const y = CY - radius * Math.sin(angle);
+    const y = CY + radius * Math.sin(angle);
     return i === 0 ? `M ${x} ${y}` : `L ${x} ${y}`;
   }).join(' ');
 }
@@ -111,9 +111,9 @@ export default function ChamberView({ members = [], filtered = [] }) {
         {/* Center aisle divider */}
         <line
           x1={CX}
-          y1={CY - ROW_CONFIG[0].radius + 20}
+          y1={CY + ROW_CONFIG[0].radius - 20}
           x2={CX}
-          y2={CY - ROW_CONFIG[ROW_CONFIG.length - 1].radius - 28}
+          y2={CY + ROW_CONFIG[ROW_CONFIG.length - 1].radius + 28}
           stroke="rgba(255,255,255,0.1)"
           strokeWidth={1.5}
           strokeDasharray="8 6"
@@ -140,14 +140,14 @@ export default function ChamberView({ members = [], filtered = [] }) {
 
         {/* Dais indicator */}
         <ellipse
-          cx={CX} cy={CY - 42}
+          cx={CX} cy={CY + 42}
           rx={64} ry={18}
           fill="rgba(255,255,255,0.04)"
           stroke="rgba(255,255,255,0.1)"
           strokeWidth={1}
         />
         <text
-          x={CX} y={CY - 37}
+          x={CX} y={CY + 47}
           textAnchor="middle"
           fill="rgba(255,255,255,0.22)"
           fontSize={9} letterSpacing={3}
