@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm run build --workspace=client",
+  "outputDirectory": "client/dist",
+  "installCommand": "npm install",
+  "crons": [
+    {
+      "path": "/api/ingest",
+      "schedule": "0 6 * * *"
+    }
+  ]
+}

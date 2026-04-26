@@ -9,5 +9,8 @@
   "scripts": {
     "dev:server": "npm run dev --workspace=server",
     "dev:client": "npm run dev --workspace=client"
+  },
+  "dependencies": {
+    "pg": "^8.11.3"
   }
 }
