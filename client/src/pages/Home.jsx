@@ -1,55 +1,53 @@
-import { useState } from 'react';
+// client/src/pages/Home.jsx
 import { useNavigate } from 'react-router-dom';
 import { ChamberGrid } from '../components/ChamberGrid/ChamberGrid';
+import { FilterBar } from '../components/FilterBar/FilterBar';
+import { useFilter } from '../context/FilterContext';
 import { useMembers } from '../hooks/useMembers';
 
+const PARTY_DISPLAY = { R: 'republican', D: 'democrat', I: 'independent' };
+
+function filterMembers(members, { party, stateFilter, gradeFilter, searchQuery }) {
+  return members.filter(m => {
+    if (party !== 'all' && m.party !== party) return false;
+    if (stateFilter !== 'all' && m.state !== stateFilter) return false;
+    if (gradeFilter !== 'all' && m.letter_grade !== gradeFilter) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const fullName = `${m.first_name} ${m.last_name}`.toLowerCase();
+      const partyName = PARTY_DISPLAY[m.party] ?? '';
+      if (
+        !fullName.includes(q) &&
+        !m.state.toLowerCase().includes(q) &&
+        !partyName.includes(q)
+      ) return false;
+    }
+    return true;
+  });
+}
+
 export default function Home() {
-  const [chamber, setChamber] = useState('senate');
   const navigate = useNavigate();
+  const { chamber, party, stateFilter, gradeFilter, searchQuery } = useFilter();
   const { members, loading, error } = useMembers(chamber);
 
+  const visible = filterMembers(members, { party, stateFilter, gradeFilter, searchQuery });
+
   return (
-    <div className="min-h-screen px-4 py-6">
-      {/* Masthead */}
-      <header
-        className="rounded-2xl p-5 mb-6 text-white"
-        style={{ background: 'linear-gradient(135deg, #cc0000, #0a1f6e)' }}
-      >
-        <h1 className="text-3xl font-bold tracking-tight">POLISCOPE</h1>
-        <p className="text-sm opacity-75 mt-1">
-          Radical transparency for American democracy.
-        </p>
-      </header>
-
-      {/* Chamber toggle */}
-      <div className="flex gap-2 mb-6">
-        {['senate', 'house'].map(c => (
-          <button
-            key={c}
-            onClick={() => setChamber(c)}
-            className="px-5 py-2 rounded-full text-sm font-bold transition-all"
-            style={{
-              backgroundColor: chamber === c ? 'var(--navy)' : 'var(--surface)',
-              color: chamber === c ? 'white' : 'var(--navy)',
-              border: '1px solid var(--border)',
-            }}
-          >
-            {c === 'senate' ? 'Senate' : 'House'}
-          </button>
-        ))}
-      </div>
-
+    <div className="min-h-screen">
+      <FilterBar />
       {error && (
-        <p className="text-sm mb-4" style={{ color: 'var(--alert)' }}>
+        <p className="text-sm px-4 py-2" style={{ color: 'var(--alert)' }}>
           Could not load members: {error}
         </p>
       )}
-
-      <ChamberGrid
-        members={members}
-        loading={loading}
-        onSelectMember={(id) => navigate(`/rep/${id}`)}
-      />
+      <div className="px-4 py-6">
+        <ChamberGrid
+          members={visible}
+          loading={loading}
+          onSelectMember={id => navigate(`/rep/${id}`)}
+        />
+      </div>
     </div>
   );
 }
