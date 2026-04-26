@@ -11,6 +11,8 @@ Poliscope is a mobile-first web app that brings radical transparency to American
 
 **Core principle:** Every piece of information is objective, auditable, and cited. The algorithm scores. The AI narrates. The user decides.
 
+**Product character:** A reference and lookup tool — beautifully designed, always current (updated to the minute via scheduled data ingestion), but not a live broadcast. Think ESPN stats page, not ESPN live game coverage.
+
 **Mission:** Civic good first. Revenue is a means to fund more projects like this — never the end goal. The app will never accept political advertising or PAC funding.
 
 ---
@@ -32,47 +34,49 @@ Both users are served by the same interface. The player card serves the casual u
 
 ## The Four Screens
 
-### 1. Live Ticker Feed (Home)
-The default view. A real-time stream of activity across all 535 members of Congress, sorted by recency.
+### 1. Chamber View (Home)
 
-**Feed events include:**
-- Vote cast (YES/NO/Present/Absent) with bill name and plain-English summary
-- Stock trade filed (STOCK Act disclosure) with amount, company, and any bill conflict flag
-- Campaign contribution received (over threshold) with donor category
-- Bill introduced or advanced out of committee
-- Attendance miss (missed vote without announced reason)
-- Net worth disclosure update
+The default view. An interactive 3D rendering of the U.S. Senate or House chamber, built with React Three Fiber. Each seat represents a sitting member. Toggle between Senate (100 seats) and House (435 seats) with an animated camera sweep between chambers.
 
-**UI behavior:**
-- Infinite scroll, swipe up like a social feed
-- Each event is a card with politician photo, name, event type badge, and one-line summary
-- Tap any event → opens the Politician Player Card or Bill Halftime depending on type
-- Filter bar: All / Votes / Trades / Money / Bills
-- "My Reps" toggle — shows only the user's Senators and Representative. Location determined by user-entered zip code on first use (stored in account or localStorage for guests). No GPS required.
+**Seat visual encoding:**
+- Color = party (blue / red / independent)
+- Glow intensity = Constituent Grade (bright green = A, dim red = F)
+- Activity indicator = pulse animation on seats with activity in the last 24 hours
+- Empty seats = visually distinct (vacancy, not yet sworn in)
+
+**Interaction:**
+- Tap any seat → Politician Player Card rises from the bottom as a Motion spring sheet
+- Filter overlay: grade range, state, party, committee membership
+- Search bar to jump directly to a member by name or state
+- Data refreshes on page load and every 60 seconds via polling — no WebSocket complexity
+
+**Toggle bar:** Senate | House — persistent at the top of the screen
 
 ---
 
 ### 2. Politician Player Card
-A compact, at-a-glance stat block. The quick view. Appears as a bottom sheet when tapping from the feed, or as a standalone page via direct URL.
+
+A compact, at-a-glance stat block. The quick view. Appears as a bottom sheet when tapping from the chamber, or as a standalone page via direct URL.
 
 **Contents:**
 - Official photo, full name, party, state, chamber, current term
-- **Constituent Grade: A–F (0–100)** — big and bold, letter grade headline, number underneath
+- **Constituent Grade: A–F (0–100)** — letter grade headline (large), number underneath (small)
 - Four quick stats:
   - Attendance % (current session)
   - Stock trades filed (YTD count + total $)
   - Net worth change since taking office
   - Top donor category (e.g., "Finance & Banking")
-- Live badge if voted in last 24 hours
+- Activity badge if voted in last 24 hours
 - "Full breakdown →" button → opens Politician Halftime screen
 
 ---
 
 ### 3. Politician Halftime Screen
+
 The full season breakdown. Everything on one scrollable page.
 
 **Sections:**
-1. **Constituent Grade breakdown** — letter + number, with sub-scores for each dimension (see Objectivity Engine)
+1. **Constituent Grade breakdown** — letter + number, with sub-scores for each of the five dimensions
 2. **Voting record** — searchable, filterable by issue category (healthcare, defense, environment, economy, etc.). Shows vote, bill name, plain-English summary, and date
 3. **Attendance record** — session-by-session, missed votes flagged
 4. **Financial disclosures**
@@ -89,6 +93,7 @@ The full season breakdown. Everything on one scrollable page.
 ---
 
 ### 4. Bill Halftime Screen
+
 Plain-English breakdown of any bill on the floor or in committee.
 
 **Sections:**
@@ -128,64 +133,107 @@ Claude is used **exclusively** to translate scores into plain English. It receiv
 
 ---
 
+## Technology Stack
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| Framework | React + Vite | Fast builds, SPA routing |
+| Styling | Tailwind CSS | Layout and utility layer |
+| 3D Chamber | React Three Fiber (Three.js) | Interactive 3D seat visualization |
+| Charts & Data Viz | Visx (Airbnb) | Animated React-native D3 charts |
+| District Maps | D3.js | Geographic maps, custom layouts |
+| Page Transitions | Motion (Framer Motion) | Spring physics, card reveals, staggered entrances |
+| Complex Timelines | GSAP | Scroll-driven sequences, orchestrated animations |
+| Icon & Badge Animation | Rive | Interactive achievement animations, grade badge reveals |
+| Global State | Zustand | Gamification state, user prefs, session data |
+| Backend | Node.js + Express | Thin routes, service layer |
+| Database | PostgreSQL (managed) | All persistent data |
+| Caching | Redis | API response caching, rate limit buffers |
+| AI | Anthropic Claude | Narration only, prompt caching, streaming |
+| Auth | JWT + email/social login | Built in from day one |
+| Hosting | Digital Ocean App Platform | Frontend + backend |
+| Data ingestion | Node-cron workers | Per-source scheduled jobs, every 1–60 min |
+
+---
+
+## Gamification System
+
+Psychological engagement through learning rewards — no live-event dependency required.
+
+**Badges (earned by using the app):**
+- "Follow the Money" — reviewed 10 stock trade disclosures
+- "Bill Watcher" — read 5 full bill breakdowns
+- "Constituent Champion" — checked your reps 30 days in a row
+- "Conflict Spotter" — opened a flagged conflict of interest
+- "Both Sides Now" — read bill breakdowns for bills that passed and failed
+
+**Streaks:**
+- Daily check-in streak during active legislative sessions
+- Displayed as a GitHub-style contribution graph on the user profile
+- Streak pauses (not breaks) during Congressional recess — keeps it fair
+
+**Progressive disclosure:**
+- Casual users see the essentials on first visit
+- Deeper data layers (historical comparisons, raw exports, custom alerts) reveal as engagement increases
+- Achievements unlock these layers explicitly — learning is the gate, not a paywall
+
+**Rive animations:**
+- Grade badge animates on reveal (spins in, locks into letter)
+- Achievement unlock triggers a short celebratory animation
+- Streak milestone gets a special visual moment
+
+---
+
 ## Data Sources
 
 | Source | Data | Update Frequency |
 |---|---|---|
-| Congress.gov API | Votes, bills, attendance, committee activity | Near real-time |
+| Congress.gov API | Votes, bills, attendance, committee activity | Every 5 minutes during session, hourly otherwise |
 | FEC API | Campaign contributions, PAC money, donor data | Daily |
-| Senate eFD / STOCK Act | Financial disclosures, stock trades | As filed (can lag weeks) |
+| Senate eFD / STOCK Act | Financial disclosures, stock trades | As filed (can lag weeks — disclosed clearly to user) |
 | ProPublica Congress API | Vote scores, bill history, member profiles | Daily |
 | CBO | Bill cost estimates | As published |
-| Think tank balance layer | Expert consensus scoring for bill impact — Brookings (center-left), Heritage (right), Cato (libertarian), Urban Institute (center-left), AEI (right). Each org's published position on a bill is fetched or curated manually for major bills, then averaged across the political spectrum to produce a balance score. No single org's framing dominates. | Curated per major bill (100+ bills/year expected) |
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Frontend | React + Vite + Tailwind CSS |
-| State | Zustand (global), useState (local) |
-| Backend | Node.js + Express, thin routes, service layer |
-| Database | PostgreSQL (managed, Digital Ocean) |
-| AI | Anthropic Claude — narration only, structured prompts, prompt caching enabled |
-| Auth | Built in from day one (JWT, email/password + social login) |
-| Hosting | Digital Ocean App Platform |
-| Data ingestion | Scheduled Node.js workers (cron) per data source |
+| Think tank balance layer | Expert consensus scoring — Brookings (center-left), Heritage (right), Cato (libertarian), Urban Institute (center-left), AEI (right). Averaged across spectrum, no single framing dominates. | Curated per major bill |
 
 ---
 
 ## Revenue Model (Flexible)
 
-Revenue is designed to be added without architectural changes. Auth and user accounts are in from day one.
+Auth and user accounts are in from day one so monetization can be layered without a rewrite.
 
-**Potential tiers (to be decided):**
-- **Free:** Full access to all public data, politician profiles, bill breakdowns, live ticker
-- **Premium:** Real-time alerts (stock trade filed, missed vote, new bill), export data, historical comparisons, "My Reps" dashboard
+**Potential tiers (to be decided post-launch):**
+- **Free:** Full access to all public data, politician profiles, bill breakdowns, chamber view
+- **Premium:** Custom alerts (stock trade filed, missed vote, new bill), data exports, historical comparisons
 - **Supporter:** Voluntary donation tier for users who want to fund the mission
 
-**Non-negotiable:** No political advertising. No PAC funding. No sponsored content that could create appearance of bias.
+**Non-negotiable:** No political advertising. No PAC funding. No sponsored content.
 
 ---
 
 ## URL Structure
 
 ```
-/                          → Live ticker feed
+/                          → Chamber view (home)
 /rep/[state]-[name]        → Politician player card
 /rep/[state]-[name]/full   → Politician halftime screen
 /bill/[congress]-[number]  → Bill halftime screen
 /about/methodology         → Public scoring methodology
 ```
 
-Shareable URLs are a core growth mechanism. Every screen is linkable.
+---
+
+## Parking Lot (revisit post-v1)
+
+These ideas have merit but add scope or require validation before committing:
+
+- **Civic Score** — a grade for the user based on their own engagement and knowledge. Compelling concept but risks feeling intrusive or gamey in a way that undermines the app's serious civic tone. Revisit after seeing how users engage with the politician grades.
+- **Live vote streaming** — WebSocket-driven real-time vote feed as Congress votes. High technical complexity and infrastructure cost for a reference tool. Strong feature for v2 once core product is proven.
 
 ---
 
 ## What Makes This Different
 
-1. **One unified display** — not a database to dig through. Everything surfaces in a sports-broadcast rhythm.
+1. **The chamber as home** — you don't search a database. You walk into the room. Every seat is a person.
 2. **The Constituent Grade** — a single auditable number that answers the question voters actually have.
 3. **Conflict of interest auto-detection** — no one has to connect the dots manually. The system flags it.
 4. **Provable objectivity** — published methodology, cited claims, algorithm-first scoring. Defensible against accusations of bias from any direction.
