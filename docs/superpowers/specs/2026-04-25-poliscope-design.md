@@ -32,7 +32,22 @@ Both users are served by the same interface. The player card serves the casual u
 
 ---
 
-## The Four Screens
+## Navigation Architecture
+
+```
+Chamber (Home)
+    └── Tap any seat → Player Page (full member profile)
+            └── Tap a bill → Bill Page (full bill breakdown)
+
+Activity Feed (secondary tab)
+    └── Tap any event → Player Page or Bill Page
+```
+
+The chamber is the entry point — pure and visual. All data depth lives inside Player Pages. The feed is a secondary tab for users who want a chronological activity stream.
+
+---
+
+## The Three Core Screens
 
 ### 1. Chamber View (Home)
 
@@ -45,7 +60,7 @@ The default view. An interactive 3D rendering of the U.S. Senate or House chambe
 - Empty seats = visually distinct (vacancy, not yet sworn in)
 
 **Interaction:**
-- Tap any seat → Politician Player Card rises from the bottom as a Motion spring sheet
+- Tap any seat → navigates to the full Player Page for that member
 - Filter overlay: grade range, state, party, committee membership
 - Search bar to jump directly to a member by name or state
 - Data refreshes on page load and every 60 seconds via polling — no WebSocket complexity
@@ -54,45 +69,23 @@ The default view. An interactive 3D rendering of the U.S. Senate or House chambe
 
 ---
 
-### 2. Politician Player Card
+### 2. Player Page
 
-A compact, at-a-glance stat block. The quick view. Appears as a bottom sheet when tapping from the chamber, or as a standalone page via direct URL.
+The full story on one member. Accessed by tapping any seat in the chamber, or via direct shareable URL. One long scrollable page — no tabs, no sub-navigation needed.
 
-**Contents:**
-- Official photo, full name, party, state, chamber, current term
-- **Constituent Grade: A–F (0–100)** — letter grade headline (large), number underneath (small)
-- Four quick stats:
-  - Attendance % (current session)
-  - Stock trades filed (YTD count + total $)
-  - Net worth change since taking office
-  - Top donor category (e.g., "Finance & Banking")
-- Activity badge if voted in last 24 hours
-- "Full breakdown →" button → opens Politician Halftime screen
-
----
-
-### 3. Politician Halftime Screen
-
-The full season breakdown. Everything on one scrollable page.
-
-**Sections:**
-1. **Constituent Grade breakdown** — letter + number, with sub-scores for each of the five dimensions
-2. **Voting record** — searchable, filterable by issue category (healthcare, defense, environment, economy, etc.). Shows vote, bill name, plain-English summary, and date
-3. **Attendance record** — session-by-session, missed votes flagged
-4. **Financial disclosures**
-   - Stock trades timeline (amount, company, buy/sell, days before/after related vote)
-   - Net worth: entering office vs. current vs. national median for comparison
-   - Real estate holdings
-5. **Campaign finance**
-   - Total raised, breakdown by donor category (individual, PAC, corporate)
-   - Top 10 donors listed
-   - PAC money accepted: yes/no, total amount, PAC names
-6. **Conflict of interest flags** — auto-generated: stock trades within 30 days of a vote on related legislation, highlighted in red with explanation
-7. **Bills sponsored / co-sponsored** — with status and outcome
+**Section order:**
+1. **Identity header** — photo, name, party, state, chamber, current term, committee memberships
+2. **Constituent Grade** — A–F letter (large) + 0–100 score, five sub-score breakdown bars, methodology link
+3. **Pattern Alerts** — auto-detected money→vote patterns, lobbying connections, conflict flags for this member (Pattern Engine). Every finding cited.
+4. **Influence Web** — corporation → PAC → donation → vote chains organized by industry
+5. **Voting record** — searchable, filterable by issue category (healthcare, defense, environment, economy, etc.). Every vote with plain-English bill summary and date
+6. **Financial disclosures** — stock trades timeline (amount, company, buy/sell, days relative to related votes), net worth trajectory vs. national median, real estate holdings
+7. **Campaign finance** — total raised, donor category breakdown, top 10 donors, PAC money accepted
+8. **Bills sponsored / co-sponsored** — with status, outcome, and any pork flags on bills they authored
 
 ---
 
-### 4. Bill Halftime Screen
+### 3. Bill Page
 
 Plain-English breakdown of any bill on the floor or in committee.
 
@@ -293,9 +286,9 @@ Auth and user accounts are in from day one so monetization can be layered withou
 
 ```
 /                          → Chamber view (home)
-/rep/[state]-[name]        → Politician player card
-/rep/[state]-[name]/full   → Politician halftime screen
-/bill/[congress]-[number]  → Bill halftime screen
+/rep/[state]-[name]        → Player page (full member profile)
+/bill/[congress]-[number]  → Bill page (full bill breakdown)
+/feed                      → Activity feed (secondary tab)
 /about/methodology         → Public scoring methodology
 ```
 
