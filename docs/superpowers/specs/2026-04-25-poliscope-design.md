@@ -222,6 +222,84 @@ Auth and user accounts are in from day one so monetization can be layered withou
 
 ---
 
+## Risk Mitigations
+
+### Retention
+- **Push notifications in v1** — web push + email digest. "Your Senator filed a stock trade." "Your Rep missed 4 votes." Without a trigger, there is no re-engagement mechanism. Not optional.
+- **"On Deck" view** — what votes are scheduled this week, bills coming out of committee. Turns a look-back archive into a look-ahead civic calendar. Gives a reason to check before news breaks, not after.
+
+### Trust & Legal
+- **Open source the scoring algorithm on day one** — public GitHub repo. Anyone can audit. Annual independent review by a nonpartisan academic institution. "Report a bias" button on every score goes to a public review queue. When accused of bias: "Here's the code. Show us where."
+- **Language discipline everywhere** — never say "corrupt" or "illegal." Every conflict flag states only facts: "Sen. X voted YES on HR-2847 (benefiting pharma companies) and filed a $45K Pfizer buy 12 days prior. Disclosed per STOCK Act." The data makes the case. The app never editorializes.
+
+### Data Reliability
+- **Freshness indicators on every data point** — STOCK Act lags 30–45 days; FEC data lags daily. Every number shows when it was last updated. Honesty about data lag beats presenting stale data as current.
+- **90-day minimum before issuing a grade** — new members get "Grade pending — insufficient data" until 90 days in office or 20 votes cast.
+- **PostgreSQL as source of truth, never live API calls** — cron workers ingest and write to DB on schedule. External API downtime doesn't cause app downtime. Last known data is served with freshness indicator.
+
+### Viral Growth
+- **Shareable "receipt" cards** — every conflict flag, every notable grade, every significant stat generates a pre-formatted OG share image. One-tap "Share this receipt" button. The share card is the marketing. No ad budget required if the data is damning enough — and it will be.
+
+---
+
+## Go-To-Market & SEO Strategy
+
+### The Core GTM Insight
+Poliscope has two growth engines: **SEO** (people searching for their rep) and **virality** (people sharing receipts). Both are free. Both compound over time. Neither requires paid acquisition.
+
+### Programmatic SEO (535+ landing pages from day one)
+
+Every politician page is a high-intent landing page optimized for:
+- "[Senator/Rep name] stock trades [year]"
+- "[Name] voting record"
+- "[Name] net worth / campaign donors / missed votes"
+- "[State] senators voting record"
+
+Every bill page targets:
+- "What is [bill name]?"
+- "Who voted for [bill]?"
+- "[Bill] explained simply"
+
+Every state gets a landing page:
+- "[State] congressional report card"
+- "[State] senators stock trades"
+
+This is **535 politician pages + ~1,000 bill pages + 50 state pages** indexed from launch. Most civic tools ignore SEO entirely — this is a significant moat.
+
+### Pre-Launch (6–8 weeks before)
+- **Build in public** on X/Twitter — "Building a tool that shows you exactly what your senator has been buying in the stock market." Show the chamber 3D view. That visual alone will get attention.
+- **Email waitlist** at poliscope.com — capture early interest before there's a product to show
+- **Find the launch story** — identify the single most egregious provable conflict of interest in current data. A senator who voted on a pharmaceutical bill and had large pharma stock trades in the surrounding window. This becomes the launch post.
+
+### Launch Week
+- **Lead with the receipt** — the launch tweet/post IS the most damning conflict of interest found in the data. Not "check out our new app." Show the thing.
+- **ProductHunt** — civic tech and transparency tools perform well; the 3D chamber is visually arresting
+- **Reddit:** r/politics, r/investing (STOCK Act angle is huge here), r/news, r/technology — the stock trading angle resonates across partisan lines
+- **Press outreach** — The Intercept, ProPublica, Axios, Politico. Frame it as a tool journalists can use to find stories. If a reporter uses Poliscope to break a story, that's a backlink and a brand moment.
+- **State-specific local news** — pitch "[State] senators' stock trades visualized" to every state's major newspaper. 50 pitches, each with state-specific data.
+
+### Ongoing Growth Engine
+- **Weekly "Notable Trades" post** — published every Monday, SEO-optimized, shareable. "The 5 biggest congressional stock trades filed this week."
+- **Monthly conflict of interest report** — "This month's most significant conflicts of interest in Congress." Journalists will cite this.
+- **"Your State's Report Card"** — periodic social posts with state-level grade breakdowns. Triggers state pride and outrage equally.
+- **Journalist power users** — if Poliscope saves a reporter 3 hours of research, they'll use it for stories and cite it in their articles. Every citation is a backlink and brand awareness. Actively court this segment.
+
+### Partnership Targets
+- **OpenSecrets** — they track money in politics; Poliscope makes it visual and accessible. Potential data partnership or co-marketing
+- **League of Women Voters, Common Cause, Rock the Vote** — established civic orgs with audiences who want exactly this tool
+- **Journalism schools** (Columbia, Northwestern Medill) — professors assigning Poliscope as a research tool creates habitual young users and academic credibility
+- **Civics teachers** — high school and college civics curriculum is a sleeper distribution channel
+
+### The Flywheel
+```
+Conflict flag detected → Share card generated → User shares on social
+→ Viral moment → New users discover Poliscope → They find their own rep
+→ They share their rep's receipt → More viral moments → More SEO backlinks
+→ Higher search rankings → More organic discovery → repeat
+```
+
+---
+
 ## Parking Lot (revisit post-v1)
 
 These ideas have merit but add scope or require validation before committing:
