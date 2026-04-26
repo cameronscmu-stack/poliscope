@@ -8,6 +8,8 @@ export function FilterProvider({ children }) {
   const [stateFilter, setStateFilter] = useState('all');
   const [gradeFilter, setGradeFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  // IDs highlighted by Find My Rep — drawn with a special ring in the chamber
+  const [highlightedIds, setHighlightedIds] = useState(new Set());
 
   return (
     <FilterContext.Provider value={{
@@ -16,6 +18,7 @@ export function FilterProvider({ children }) {
       stateFilter, setStateFilter,
       gradeFilter, setGradeFilter,
       searchQuery, setSearchQuery,
+      highlightedIds, setHighlightedIds,
     }}>
       {children}
     </FilterContext.Provider>
