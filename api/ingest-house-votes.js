@@ -53,6 +53,7 @@ export default async function handler(req, res) {
   }
 
   const pool = getPool();
+  const batchLimit = parseInt(req.query?.limit ?? '50', 10);
   let inserted = 0, skipped = 0, errors = 0;
 
   try {
@@ -64,8 +65,10 @@ export default async function handler(req, res) {
 
     const voteList = await fetchVoteList();
     console.log(`House: ${voteList.length} votes, ${alreadyIngested.size} already ingested`);
+    let processed = 0;
 
     for (const entry of voteList) {
+      if (processed >= batchLimit) break;
       const voteNumber = parseInt(entry.voteNumber ?? entry.rollNumber, 10);
       if (!voteNumber || alreadyIngested.has(voteNumber)) continue;
       if (shouldSkip(entry.question ?? '')) { skipped++; continue; }
@@ -100,6 +103,7 @@ export default async function handler(req, res) {
           );
           inserted++;
         }
+        processed++;
       } catch (err) {
         console.error(`House vote ${voteNumber} error:`, err.message);
         errors++;

@@ -55,6 +55,8 @@ export default async function handler(req, res) {
   }
 
   const pool = getPool();
+  // Process at most `limit` new votes per call to avoid Vercel timeout (default 50)
+  const batchLimit = parseInt(req.query?.limit ?? '50', 10);
   let inserted = 0, skipped = 0, errors = 0;
 
   try {
@@ -66,8 +68,10 @@ export default async function handler(req, res) {
 
     const voteList = await fetchVoteList();
     console.log(`Senate: ${voteList.length} votes, ${alreadyIngested.size} already ingested`);
+    let processed = 0;
 
     for (const entry of voteList) {
+      if (processed >= batchLimit) break;
       const voteNumber = parseInt(entry.vote_number, 10);
       if (!voteNumber || alreadyIngested.has(voteNumber)) continue;
       const questionText = getQuestionText(entry);
@@ -109,13 +113,19 @@ export default async function handler(req, res) {
           );
           inserted++;
         }
+        processed++;
       } catch (err) {
         console.error(`Senate vote ${voteNumber} error:`, err.message);
         errors++;
       }
     }
 
-    res.json({ ok: true, inserted, skipped, errors });
+    const remaining = voteList.filter(v => {
+      const n = parseInt(v.vote_number, 10);
+      return n && !alreadyIngested.has(n) && !shouldSkip(getQuestionText(v));
+    }).length - processed;
+
+    res.json({ ok: true, inserted, skipped, errors, remaining: Math.max(0, remaining) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
