@@ -41,7 +41,7 @@ describe('PlayerPage', () => {
 
   it('renders the composite score', () => {
     renderPage({ member });
-    expect(screen.getByText('82')).toBeInTheDocument();
+    expect(screen.getByText('82.0')).toBeInTheDocument();
   });
 
   it('renders both dimension scores', () => {
