@@ -173,12 +173,6 @@ export default function ChamberView({ members = [], filtered = [] }) {
           );
         })}
 
-        {/* DEBUG: confirm first seat position */}
-        {seated[0] && <circle cx={seated[0].x} cy={seated[0].y} r={30} fill="lime" opacity={0.8} />}
-        <text x={10} y={50} fill="yellow" fontSize={28} fontWeight="bold">
-          {`n=${seated.length} x0=${seated[0]?.x?.toFixed(0)} y0=${seated[0]?.y?.toFixed(0)}`}
-        </text>
-
         {/* Senator seats */}
         {seated.map(({ x, y, member }, seatIndex) => {
           if (!member) return null;
