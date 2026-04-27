@@ -24,18 +24,26 @@ async function cgFetch(path) {
 async function computeLegislativeScores(memberId) {
   try {
     const data = await cgFetch(`/member/${memberId}/sponsored-legislation?limit=250`);
-    const bills = (data?.sponsoredLegislation ?? []).filter(b => !['HAMDT', 'SAMDT'].includes(b.type));
+    // Filter to actual bills only (amendments have amendmentNumber field and null type)
+    const bills = (data?.sponsoredLegislation ?? []).filter(b => b.type && !b.amendmentNumber);
     const introduced = bills.length;
     if (introduced === 0) return { legislativeScore: 0, bipartisanScore: 0 };
 
-    const advanced = bills.filter(b => {
+    // "Advanced" = any action beyond introduction (committee referral still counts)
+    // Use passage/signing for the strongest score, committee progression for partial credit
+    const fullyPassed = bills.filter(b => {
       const a = (b.latestAction?.text ?? '').toLowerCase();
       return a.includes('passed') || a.includes('signed') || a.includes('became public law');
     }).length;
+    const hadAction = bills.filter(b => {
+      const a = (b.latestAction?.text ?? '');
+      return a.length > 0 && b.latestAction?.actionDate;
+    }).length;
 
-    const withCosponsors = bills.filter(b => (b.cosponsors?.count ?? b.cosponsorsCount ?? 0) > 0).length;
-    const legislativeScore = ((advanced / introduced) * 0.6 + (withCosponsors / introduced) * 0.4) * 100;
-    const bipartisanScore = Math.min((withCosponsors / introduced) * 200, 100);
+    // Score = (full passage × 1.0 + any action × 0.3) / introduced, scaled to 100
+    const legislativeScore = Math.min(((fullyPassed * 1.0 + hadAction * 0.3) / introduced) * 100, 100);
+    // Bipartisan approximated by bills with any action (proxy until cosponsor API added)
+    const bipartisanScore = Math.min((hadAction / introduced) * 100, 100);
     return { legislativeScore, bipartisanScore };
   } catch {
     return { legislativeScore: 0, bipartisanScore: 0 };
