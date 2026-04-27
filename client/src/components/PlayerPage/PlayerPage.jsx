@@ -146,7 +146,32 @@ export function PlayerPage({ member, activity }) {
       <div className="glass-card p-6 mb-4">
         <h2 className="text-xs uppercase tracking-widest opacity-50 mb-4">Constituent Grade</h2>
         {!member.data_sufficient ? (
-          <p className="text-sm opacity-60">Grade pending — scoring pipeline coming soon (attendance, party independence, bill passage rate, constituent responsiveness)</p>
+          <div>
+            <p className="text-sm opacity-60 mb-3">
+              {member.composite_score != null
+                ? 'Partial grade — more data still loading'
+                : 'Grade pending — vote data is being ingested'}
+            </p>
+            {member.composite_score != null && (
+              <div className="flex items-center gap-4 mb-4">
+                <div
+                  className="text-5xl font-bold w-16 h-16 rounded-xl flex items-center justify-center text-white"
+                  style={{ backgroundColor: gradeColor, opacity: 0.8 }}
+                >
+                  {member.letter_grade}
+                </div>
+                <div>
+                  <div className="text-3xl font-bold" style={{ color: 'var(--navy)' }}>
+                    {typeof member.composite_score === 'number' ? member.composite_score.toFixed(1) : member.composite_score}
+                  </div>
+                  <div className="text-xs opacity-40">partial score</div>
+                </div>
+              </div>
+            )}
+            {member.attendance_score != null && <DimensionBar label="Attendance (30%)" score={parseFloat(member.attendance_score).toFixed(1)} />}
+            {member.party_independence_score != null && <DimensionBar label="Party Independence (25%)" score={parseFloat(member.party_independence_score).toFixed(1)} />}
+            {member.legislative_score != null && <DimensionBar label="Legislative Effectiveness (20%)" score={parseFloat(member.legislative_score).toFixed(1)} />}
+          </div>
         ) : (
           <>
             <div className="flex items-center gap-6 mb-6">
@@ -157,13 +182,40 @@ export function PlayerPage({ member, activity }) {
                 {member.letter_grade}
               </div>
               <div>
-                <div className="text-5xl font-bold" style={{ color: 'var(--navy)' }}>{member.composite_score}</div>
+                <div className="text-5xl font-bold" style={{ color: 'var(--navy)' }}>
+                  {typeof member.composite_score === 'number' ? member.composite_score.toFixed(1) : member.composite_score}
+                </div>
                 <div className="text-xs opacity-50 mt-1">out of 100</div>
+                {member.score_window_start && (
+                  <div style={{ fontSize: 10, opacity: 0.4, marginTop: 4 }}>
+                    {new Date(member.score_window_start).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                    {' – '}
+                    {member.score_window_end ? new Date(member.score_window_end).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'present'}
+                  </div>
+                )}
               </div>
             </div>
             <div className="text-xs uppercase tracking-widest opacity-50 mb-3">Score Breakdown</div>
-            {member.attendance_score != null && <DimensionBar label="Attendance" score={member.attendance_score} />}
-            {member.party_independence_score != null && <DimensionBar label="Party Independence" score={member.party_independence_score} />}
+            {member.attendance_score != null && <DimensionBar label="Attendance (30%)" score={parseFloat(member.attendance_score).toFixed(1)} />}
+            {member.party_independence_score != null && <DimensionBar label="Party Independence (25%)" score={parseFloat(member.party_independence_score).toFixed(1)} />}
+            {member.legislative_score != null && <DimensionBar label="Legislative Effectiveness (20%)" score={parseFloat(member.legislative_score).toFixed(1)} />}
+            {member.campaign_finance_score != null && <DimensionBar label="Campaign Finance (15%)" score={parseFloat(member.campaign_finance_score).toFixed(1)} />}
+            {member.bipartisan_score != null && <DimensionBar label="Bipartisan Engagement (10%)" score={parseFloat(member.bipartisan_score).toFixed(1)} />}
+            {member.votes_cast != null && (
+              <p style={{ fontSize: 11, opacity: 0.35, marginTop: 12 }}>
+                Based on {member.votes_cast} of {member.total_votes_eligible} eligible votes
+              </p>
+            )}
+            <details style={{ marginTop: 16 }}>
+              <summary style={{ fontSize: 11, opacity: 0.5, cursor: 'pointer' }}>How this is calculated</summary>
+              <div style={{ fontSize: 11, opacity: 0.6, marginTop: 8, lineHeight: 1.6 }}>
+                <p><strong>Attendance</strong> — % of roll call votes cast (vs. eligible)</p>
+                <p><strong>Party Independence</strong> — % of votes against their own party's majority position (scaled: 20% crossover = 100 pts)</p>
+                <p><strong>Legislative Effectiveness</strong> — bills advanced past committee + bipartisan cosponsor ratio</p>
+                <p><strong>Campaign Finance</strong> — small-donor % vs. PAC dependency (FEC data)</p>
+                <p><strong>Bipartisan Engagement</strong> — sponsored bills with at least one cross-party cosponsor</p>
+              </div>
+            </details>
           </>
         )}
       </div>

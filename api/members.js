@@ -8,7 +8,12 @@ export default async function handler(req, res) {
     const { chamber } = req.query;
     let query = `
       SELECT m.id, m.first_name, m.last_name, m.party, m.state, m.chamber,
-             m.district, m.photo_url, g.composite_score, g.letter_grade, g.data_sufficient
+             m.district, m.photo_url,
+             g.composite_score, g.letter_grade, g.data_sufficient,
+             g.attendance_score, g.party_independence_score,
+             g.legislative_score, g.campaign_finance_score, g.bipartisan_score,
+             g.total_votes_eligible, g.votes_cast,
+             g.score_window_start, g.score_window_end
       FROM members m
       LEFT JOIN grade_scores g ON g.member_id = m.id
       WHERE m.in_office = true
