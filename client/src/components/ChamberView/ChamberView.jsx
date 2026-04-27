@@ -100,10 +100,10 @@ export default function ChamberView({ members = [], filtered = [] }) {
             <stop offset="0%"   stopColor="#1e3060" />
             <stop offset="100%" stopColor="#0c1828" />
           </radialGradient>
-          {seated.map(({ member }) =>
+          {seated.map(({ x, y, member }) =>
             member ? (
-              <clipPath key={member.id} id={`cp-${member.id}`}>
-                <circle cx={0} cy={0} r={SEAT_R} />
+              <clipPath key={member.id} id={`cp-${member.id}`} clipPathUnits="userSpaceOnUse">
+                <circle cx={x} cy={y} r={SEAT_R} />
               </clipPath>
             ) : null
           )}
@@ -185,55 +185,32 @@ export default function ChamberView({ members = [], filtered = [] }) {
           return (
             <g
               key={member.id}
-              transform={`translate(${x.toFixed(1)}, ${y.toFixed(1)})`}
-              style={{
-                cursor: 'pointer',
-                opacity: active ? 1 : 0.12,
-                transition: 'opacity 0.3s ease',
-              }}
+              style={{ cursor: 'pointer', opacity: active ? 1 : 0.12, transition: 'opacity 0.3s ease' }}
               onMouseEnter={() => setHovered(member)}
               onMouseLeave={() => setHovered(null)}
               onClick={() => setSelectedMemberId(member.id)}
               role="button"
               aria-label={`${member.first_name} ${member.last_name} (${member.state})`}
             >
-              {/* Highlight pulse ring for Find My Rep results */}
               {highlighted && (
-                <circle r={SEAT_R + RING_W + 8} fill="rgba(255,220,60,0.18)" stroke="rgba(255,220,60,0.7)" strokeWidth={2} />
+                <circle cx={x} cy={y} r={SEAT_R + RING_W + 8} fill="rgba(255,220,60,0.18)" stroke="rgba(255,220,60,0.7)" strokeWidth={2} />
               )}
-
-              {/* Party ring */}
-              <circle r={SEAT_R + RING_W} fill={color} />
-
-              {/* Photo background */}
-              <circle r={SEAT_R} fill="#c8d8ec" />
-
-              {/* Senator photo */}
+              <circle cx={x} cy={y} r={SEAT_R + RING_W} fill={color} />
+              <circle cx={x} cy={y} r={SEAT_R} fill="#c8d8ec" />
               <image
                 href={member.photo_url}
-                x={-SEAT_R}
-                y={-SEAT_R}
+                x={x - SEAT_R}
+                y={y - SEAT_R}
                 width={SEAT_R * 2}
                 height={SEAT_R * 2}
                 clipPath={`url(#cp-${member.id})`}
                 preserveAspectRatio="xMidYMid slice"
               />
-
-              {/* Grade dot — bottom-right corner */}
               {gradeColor && (
-                <circle
-                  cx={SEAT_R * 0.62}
-                  cy={SEAT_R * 0.62}
-                  r={5}
-                  fill={gradeColor}
-                  stroke="rgba(0,0,0,0.4)"
-                  strokeWidth={0.75}
-                />
+                <circle cx={x + SEAT_R * 0.62} cy={y + SEAT_R * 0.62} r={5} fill={gradeColor} stroke="rgba(0,0,0,0.4)" strokeWidth={0.75} />
               )}
-
-              {/* Hover ring */}
               {isHov && (
-                <circle r={SEAT_R + RING_W + 5} fill="none" stroke="white" strokeWidth={2} opacity={0.85} />
+                <circle cx={x} cy={y} r={SEAT_R + RING_W + 5} fill="none" stroke="white" strokeWidth={2} opacity={0.85} />
               )}
             </g>
           );
