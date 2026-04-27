@@ -190,8 +190,6 @@ export default function ChamberView({ members = [], filtered = [] }) {
                 cursor: 'pointer',
                 opacity: active ? 1 : 0.12,
                 transition: 'opacity 0.3s ease',
-                animation: `seatFadeIn 0.45s cubic-bezier(0.16,1,0.3,1) both`,
-                animationDelay: `${seatIndex * 4}ms`,
               }}
               onMouseEnter={() => setHovered(member)}
               onMouseLeave={() => setHovered(null)}
