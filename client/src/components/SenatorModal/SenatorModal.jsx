@@ -59,6 +59,7 @@ export function SenatorModal({ memberId, onClose }) {
           boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
           position: 'relative',
           overflow: 'hidden',
+          animation: 'modalEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1) both',
         }}
       >
         {/* Close button */}

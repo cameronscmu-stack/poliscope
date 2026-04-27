@@ -38,16 +38,39 @@ export function TopNav() {
           <Link
             to="/"
             style={{
-              fontFamily: "'Bricolage Grotesque', sans-serif",
-              fontWeight: 800,
-              fontSize: '1.25rem',
-              letterSpacing: '2px',
-              color: 'var(--navy)',
               textDecoration: 'none',
               flexShrink: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              lineHeight: 1,
             }}
           >
-            POLISCOPE
+            <span
+              style={{
+                fontFamily: "'Bricolage Grotesque', sans-serif",
+                fontWeight: 800,
+                fontSize: '1.625rem',
+                letterSpacing: '-0.04em',
+                color: 'var(--navy)',
+                lineHeight: 1,
+              }}
+            >
+              POLISCOPE
+            </span>
+            <span
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontStyle: 'italic',
+                fontWeight: 300,
+                fontSize: '0.6rem',
+                letterSpacing: '0.06em',
+                color: 'var(--navy)',
+                opacity: 0.4,
+                marginTop: 2,
+              }}
+            >
+              Follow Congress. Follow the money.
+            </span>
           </Link>
 
           <div style={{ flex: 1 }}>
@@ -65,7 +88,8 @@ export function TopNav() {
                   maxWidth: '360px',
                   padding: '7px 12px',
                   borderRadius: '8px',
-                  border: focusedSearch ? '2px solid var(--sky-accent)' : '1px solid var(--border)',
+                  border: focusedSearch ? '1.5px solid var(--accent)' : '1px solid rgba(10,31,110,0.15)',
+                  transition: 'border-color 0.15s ease',
                   background: 'rgba(255,255,255,0.6)',
                   color: 'var(--navy)',
                   fontSize: '0.875rem',
@@ -97,17 +121,20 @@ export function TopNav() {
                 style={{
                   padding: '6px 14px',
                   borderRadius: 8,
-                  border: '1px solid var(--border)',
+                  border: '1px solid rgba(10,31,110,0.15)',
                   background: 'transparent',
                   color: 'var(--navy)',
                   fontWeight: 600,
                   fontSize: '0.8rem',
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
-                  opacity: 0.8,
+                  opacity: 0.65,
+                  transition: 'opacity 0.15s ease, border-color 0.15s ease',
                 }}
+                onMouseEnter={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
+                onMouseLeave={e => { e.currentTarget.style.opacity = '0.65'; e.currentTarget.style.borderColor = 'rgba(10,31,110,0.15)'; e.currentTarget.style.color = 'var(--navy)'; }}
               >
-                Find My Reps
+                📍 Find My Reps
               </button>
             )}
             <NavLink to="/" label="Congress" />
@@ -129,11 +156,14 @@ function NavLink({ to, label }) {
       style={{
         fontSize: '0.875rem',
         fontWeight: 600,
-        color: active ? 'var(--sky-accent)' : 'var(--navy)',
+        color: active ? 'var(--accent)' : 'var(--navy)',
         textDecoration: 'none',
-        borderBottom: active ? '2px solid var(--sky-accent)' : '2px solid transparent',
+        borderBottom: active ? '2px solid var(--accent)' : '2px solid transparent',
         paddingBottom: '2px',
-        opacity: active ? 1 : 0.7,
+        opacity: active ? 1 : 0.5,
+        fontWeight: 700,
+        letterSpacing: '0.02em',
+        transition: 'opacity 0.15s ease, color 0.15s ease',
       }}
     >
       {label}

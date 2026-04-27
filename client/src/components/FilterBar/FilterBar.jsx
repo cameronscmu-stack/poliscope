@@ -64,7 +64,17 @@ export function FilterBar() {
     party, setParty,
     stateFilter, setStateFilter,
     gradeFilter, setGradeFilter,
+    searchQuery, setSearchQuery,
   } = useFilter();
+
+  const hasActiveFilters = party !== 'all' || stateFilter !== 'all' || gradeFilter !== 'all' || searchQuery !== '';
+
+  function clearFilters() {
+    setParty('all');
+    setStateFilter('all');
+    setGradeFilter('all');
+    setSearchQuery('');
+  }
 
   return (
     <div
@@ -126,6 +136,29 @@ export function FilterBar() {
             </button>
           );
         })}
+
+        {/* Clear all */}
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--accent)',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              padding: '0 4px',
+              letterSpacing: '0.02em',
+              opacity: 0.9,
+              textDecoration: 'underline',
+              textUnderlineOffset: 3,
+            }}
+          >
+            Clear all
+          </button>
+        )}
 
         {/* State + Grade dropdowns */}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>

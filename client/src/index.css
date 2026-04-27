@@ -1,16 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=DM+Sans:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap');
 
 @import "tailwindcss";
 
 :root {
-  --bg-sky: linear-gradient(160deg, #ddeeff 0%, #eef4ff 50%, #f5f8ff 100%);
-  --surface: rgba(255, 255, 255, 0.75);
-  --border: rgba(255, 255, 255, 0.9);
+  --bg-sky: linear-gradient(160deg, #d6e8ff 0%, #e8f0ff 50%, #f2f6ff 100%);
+  --surface: rgba(255, 255, 255, 0.78);
+  --border: rgba(200, 220, 255, 0.6);
   --navy: #0a1f6e;
   --sky-accent: #1a4aaa;
+  --accent: #e85d04;
   --alert: #cc2222;
   --positive: #1a7a4a;
-  --shadow: rgba(20, 60, 180, 0.12);
+  --shadow: rgba(20, 60, 180, 0.10);
   --party-r: #cc0000;
   --party-d: #1a4aaa;
   --party-i: #555555;
@@ -29,6 +30,11 @@ h1, h2, h3, h4, .display {
   font-weight: 700;
 }
 
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
 .glass-card {
   background: var(--surface);
   backdrop-filter: blur(20px);
@@ -36,4 +42,29 @@ h1, h2, h3, h4, .display {
   border: 1px solid var(--border);
   box-shadow: 0 20px 60px var(--shadow);
   border-radius: 16px;
+}
+
+/* --- Entrance animations --- */
+
+@keyframes seatFadeIn {
+  from { opacity: 0; transform: scale(0.4); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes modalEnter {
+  from { opacity: 0; transform: scale(0.96) translateY(12px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -25,6 +25,7 @@ const RING_W = 3;
 const PARTY_COLOR = { D: '#1a4aaa', R: '#cc0000', I: '#666666' };
 const PARTY_LABEL = { D: 'Democrat', R: 'Republican', I: 'Independent' };
 const PARTY_ORDER = { D: 0, I: 1, R: 2 };
+const GRADE_COLOR = { A: '#1a7a4a', B: '#2a9a5a', C: '#cc9900', D: '#cc6600', F: '#cc2222' };
 
 function rowSeats(radius, count) {
   return Array.from({ length: count }, (_, i) => {
@@ -173,12 +174,13 @@ export default function ChamberView({ members = [], filtered = [] }) {
         })}
 
         {/* Senator seats */}
-        {seated.map(({ x, y, member }) => {
+        {seated.map(({ x, y, member }, seatIndex) => {
           if (!member) return null;
           const active      = !isFiltering || filteredSet.has(member.id);
           const highlighted = hasHighlights && highlightedIds.has(member.id);
           const isHov       = hovered?.id === member.id;
           const color       = PARTY_COLOR[member.party] ?? '#666';
+          const gradeColor  = GRADE_COLOR[member.letter_grade];
 
           return (
             <g
@@ -187,7 +189,9 @@ export default function ChamberView({ members = [], filtered = [] }) {
               style={{
                 cursor: 'pointer',
                 opacity: active ? 1 : 0.12,
-                transition: 'opacity 0.25s ease',
+                transition: 'opacity 0.3s ease',
+                animation: `seatFadeIn 0.45s cubic-bezier(0.16,1,0.3,1) both`,
+                animationDelay: `${seatIndex * 4}ms`,
               }}
               onMouseEnter={() => setHovered(member)}
               onMouseLeave={() => setHovered(null)}
@@ -217,6 +221,18 @@ export default function ChamberView({ members = [], filtered = [] }) {
                 preserveAspectRatio="xMidYMid slice"
               />
 
+              {/* Grade dot — bottom-right corner */}
+              {gradeColor && (
+                <circle
+                  cx={SEAT_R * 0.62}
+                  cy={SEAT_R * 0.62}
+                  r={5}
+                  fill={gradeColor}
+                  stroke="rgba(0,0,0,0.4)"
+                  strokeWidth={0.75}
+                />
+              )}
+
               {/* Hover ring */}
               {isHov && (
                 <circle r={SEAT_R + RING_W + 5} fill="none" stroke="white" strokeWidth={2} opacity={0.85} />
@@ -227,6 +243,36 @@ export default function ChamberView({ members = [], filtered = [] }) {
       </svg>
 
       {hovered && <SenatorCard member={hovered} />}
+
+      {/* Legend */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 20,
+        padding: '8px 16px',
+        background: 'rgba(0,0,0,0.35)',
+        flexWrap: 'wrap',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {[['D','#1a4aaa','Dem'], ['R','#cc0000','Rep'], ['I','#666666','Ind']].map(([key, color, label]) => (
+            <span key={key} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <svg width={12} height={12}><circle cx={6} cy={6} r={6} fill={color} /></svg>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.04em' }}>{label}</span>
+            </span>
+          ))}
+        </div>
+        <div style={{ width: 1, height: 14, background: 'rgba(255,255,255,0.12)' }} />
+        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.04em', marginRight: 4 }}>Grade dot:</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {Object.entries(GRADE_COLOR).map(([grade, color]) => (
+            <span key={grade} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <svg width={10} height={10}><circle cx={5} cy={5} r={5} fill={color} /></svg>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>{grade}</span>
+            </span>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -264,8 +310,28 @@ function SenatorCard({ member }) {
           {member.first_name} {member.last_name}
         </div>
         <div style={{ fontSize: 12, color: 'var(--navy)', opacity: 0.55, marginTop: 2 }}>
-          {PARTY_LABEL[member.party] ?? member.party} &middot; {member.state}
+          {PARTY_LABEL[member.party] ?? member.party} · {member.state}
         </div>
+        {member.letter_grade && (
+          <div style={{ marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{
+              fontSize: 11,
+              fontWeight: 800,
+              color: '#fff',
+              background: GRADE_COLOR[member.letter_grade],
+              borderRadius: 4,
+              padding: '1px 6px',
+              fontFamily: "'Bricolage Grotesque', sans-serif",
+            }}>
+              {member.letter_grade}
+            </span>
+            {member.composite_score != null && (
+              <span style={{ fontSize: 11, opacity: 0.5, color: 'var(--navy)' }}>
+                {parseFloat(member.composite_score).toFixed(1)}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
