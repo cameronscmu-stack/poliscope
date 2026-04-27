@@ -6,6 +6,18 @@
     {
       "path": "/api/ingest",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/ingest-senate-votes",
+      "schedule": "0 3 * * 0"
+    },
+    {
+      "path": "/api/ingest-house-votes",
+      "schedule": "0 4 * * 0"
+    },
+    {
+      "path": "/api/compute-grades",
+      "schedule": "0 5 * * 0"
     }
   ]
 }
