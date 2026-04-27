@@ -2,6 +2,7 @@ import { useFilter } from '../context/FilterContext';
 import { useMembers } from '../hooks/useMembers';
 import { FilterBar } from '../components/FilterBar/FilterBar';
 import ChamberView from '../components/ChamberView/ChamberView';
+import { LegislationFeed } from '../components/LegislationFeed/LegislationFeed';
 
 const PARTY_DISPLAY = { R: 'republican', D: 'democrat', I: 'independent' };
 
@@ -56,6 +57,8 @@ export default function Home() {
         </span>
       </div>
       <ChamberView members={members} filtered={filtered} />
+      <div style={{ borderTop: '1px solid var(--border)', marginTop: 24 }} />
+      <LegislationFeed />
     </div>
   );
 }
