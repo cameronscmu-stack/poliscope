@@ -31,7 +31,7 @@ async function fetchVoteList() {
   let offset = 0;
   while (true) {
     const data = await cgFetch(`/house-vote/${CONGRESS}/${SESSION}?limit=250&offset=${offset}`);
-    const batch = data?.houseVotes ?? [];
+    const batch = data?.houseRollCallVotes ?? [];
     votes.push(...batch);
     if (batch.length < 250) break;
     offset += 250;
@@ -57,6 +57,10 @@ export default async function handler(req, res) {
   let inserted = 0, skipped = 0, errors = 0;
 
   try {
+    // Pre-load valid member IDs to avoid FK violations on delegates/non-members
+    const { rows: memberRows } = await pool.query(`SELECT id FROM members WHERE chamber = 'house'`);
+    const validMembers = new Set(memberRows.map(r => r.id));
+
     const { rows } = await pool.query(
       `SELECT vote_number FROM vote_records WHERE chamber = 'house' AND congress = $1 AND session_num = $2`,
       [CONGRESS, SESSION]
@@ -69,30 +73,31 @@ export default async function handler(req, res) {
 
     for (const entry of voteList) {
       if (processed >= batchLimit) break;
-      const voteNumber = parseInt(entry.voteNumber ?? entry.rollNumber, 10);
+      const voteNumber = parseInt(entry.rollCallNumber, 10);
       if (!voteNumber || alreadyIngested.has(voteNumber)) continue;
-      if (shouldSkip(entry.question ?? '')) { skipped++; continue; }
+      if (shouldSkip(entry.voteType ?? '')) { skipped++; continue; }
 
       try {
         const detail = await cgFetch(`/house-vote/${CONGRESS}/${SESSION}/${voteNumber}/members`);
-        const memberVotes = detail?.voteMembers ?? [];
-        const voteDate = entry.voteDate ? new Date(entry.voteDate).toISOString().slice(0, 10) : null;
-        const category = categorizePurpose(entry.question);
+        const memberVotes = (detail?.houseRollCallVoteMemberVotes?.results ?? [])
+          .filter(mv => validMembers.has(mv.bioguideID));
+        const voteDate = entry.startDate ? new Date(entry.startDate).toISOString().slice(0, 10) : null;
+        const category = categorizePurpose(entry.voteType);
 
         const partyTotals = {};
         for (const mv of memberVotes) {
-          const p = mv.party;
-          const vc = normalizeVoteCast(mv.voteCast ?? mv.votePosition);
+          const p = mv.voteParty;
+          const vc = normalizeVoteCast(mv.voteCast);
           if (!partyTotals[p]) partyTotals[p] = { yea: 0, nay: 0 };
           if (vc === 'Yea') partyTotals[p].yea++;
           else if (vc === 'Nay') partyTotals[p].nay++;
         }
 
         for (const mv of memberVotes) {
-          const bioguideId = mv.bioguideId ?? mv.memberId;
+          const bioguideId = mv.bioguideID;
           if (!bioguideId) continue;
-          const voteCast = normalizeVoteCast(mv.voteCast ?? mv.votePosition);
-          const pt = partyTotals[mv.party];
+          const voteCast = normalizeVoteCast(mv.voteCast);
+          const pt = partyTotals[mv.voteParty];
           const partyMajority = pt ? (pt.yea >= pt.nay ? 'Yea' : 'Nay') : null;
 
           await pool.query(

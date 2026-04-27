@@ -38,7 +38,7 @@ async function fetchVoteList() {
 
   while (true) {
     const data = await cgFetch(`/house-vote/${CONGRESS}/${SESSION}?limit=${limit}&offset=${offset}`);
-    const batch = data?.houseVotes ?? [];
+    const batch = data?.houseRollCallVotes ?? [];
     votes.push(...batch);
     if (batch.length < limit) break;
     offset += limit;
@@ -61,16 +61,19 @@ export async function ingestHouseVotes({ verbose = false } = {}) {
   let errors = 0;
 
   try {
+    const { rows: memberRows } = await client.query(`SELECT id FROM members WHERE chamber = 'house'`);
+    const validMembers = new Set(memberRows.map(r => r.id));
+
     const alreadyIngested = await getAlreadyIngested(client);
     const voteList = await fetchVoteList();
 
     if (verbose) console.log(`House: ${voteList.length} votes in list, ${alreadyIngested.size} already ingested`);
 
     for (const voteEntry of voteList) {
-      const voteNumber = parseInt(voteEntry.voteNumber ?? voteEntry.rollNumber, 10);
+      const voteNumber = parseInt(voteEntry.rollCallNumber, 10);
       if (!voteNumber || alreadyIngested.has(voteNumber)) continue;
 
-      const questionText = voteEntry.question ?? '';
+      const questionText = voteEntry.voteType ?? '';
       if (shouldSkip(questionText)) {
         skipped++;
         continue;
@@ -78,34 +81,34 @@ export async function ingestHouseVotes({ verbose = false } = {}) {
 
       try {
         const detail = await cgFetch(`/house-vote/${CONGRESS}/${SESSION}/${voteNumber}/members`);
-        const memberVotes = detail?.voteMembers ?? [];
+        const memberVotes = (detail?.houseRollCallVoteMemberVotes?.results ?? [])
+          .filter(mv => validMembers.has(mv.bioguideID));
 
-        const voteDate = voteEntry.voteDate
-          ? new Date(voteEntry.voteDate).toISOString().slice(0, 10)
+        const voteDate = voteEntry.startDate
+          ? new Date(voteEntry.startDate).toISOString().slice(0, 10)
           : null;
         const category = categorizePurpose(questionText);
 
         // Build party majority positions
         const partyTotals = {};
         for (const mv of memberVotes) {
-          const party = mv.party;
-          const vc = mv.voteCast ?? mv.votePosition;
+          const party = mv.voteParty;
+          const vc = mv.voteCast;
           if (!partyTotals[party]) partyTotals[party] = { yea: 0, nay: 0 };
           if (vc === 'Yea' || vc === 'Yes' || vc === 'Aye') partyTotals[party].yea++;
           else if (vc === 'Nay' || vc === 'No') partyTotals[party].nay++;
         }
 
         for (const mv of memberVotes) {
-          const bioguideId = mv.bioguideId ?? mv.memberId;
+          const bioguideId = mv.bioguideID;
           if (!bioguideId) continue;
 
-          const rawCast = mv.voteCast ?? mv.votePosition ?? '';
-          // Normalize vote cast to canonical form
+          const rawCast = mv.voteCast ?? '';
           const voteCast = (['Yea', 'Yes', 'Aye'].includes(rawCast)) ? 'Yea'
             : (['Nay', 'No'].includes(rawCast)) ? 'Nay'
             : rawCast || 'Not Voting';
 
-          const party = mv.party;
+          const party = mv.voteParty;
           const partyMajority = partyTotals[party]
             ? (partyTotals[party].yea >= partyTotals[party].nay ? 'Yea' : 'Nay')
             : null;
